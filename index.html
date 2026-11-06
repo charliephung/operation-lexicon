@@ -312,7 +312,6 @@ footer.credits a{color:inherit}
           <button id="newBtn">New round</button>
           <button id="resetScoreBtn">Reset scores</button>
           <div class="mode" role="group" aria-label="Card type"><button id="modePic" aria-pressed="true">Art</button><button id="modeMine" aria-pressed="false">Custom</button><button id="modeWord" aria-pressed="false">Words</button></div>
-          <label><input type="checkbox" id="colorChk"> Color pictures</label>
           <label><input type="checkbox" id="soundChk" checked> Sound effects</label>
         </div>
       </div>
@@ -421,7 +420,7 @@ const SCENES = [
 const an = w => (/^[aeiou]/i.test(w) ? 'an ' : 'a ') + w;
 const plural = w => /(s|x|z|ch|sh)$/.test(w) ? w + 'es' : /[^aeiou]y$/.test(w) ? w.slice(0,-1) + 'ies' : w + 's';
 
-let colorOn = false;
+let colorOn = true; // color pictures always; black ink only if assets/color.js is missing
 const hasColor = () => typeof COLOR_PICS !== 'undefined' && COLOR_PICS.length === PICTURES.length && COLOR_CONTS.length === CONTAINERS.length;
 function surrealCard(inner, cont, id, seed){
   // "an object inside a container": e.g. a seahorse inside a donut
@@ -709,13 +708,6 @@ $('modeMine').onclick = ()=> findCustom().then(list=>{
 if(mode === 'photos' || mode === 'ai') mode = 'pictures'; // removed modes
 syncModeButtons();
 if(typeof PICTURES === 'undefined') $('modePic').disabled = true;
-colorOn = store.get('lexicon-color', false);
-$('colorChk').checked = colorOn;
-$('colorChk').disabled = !hasColor();
-$('colorChk').onchange = e=>{ colorOn = e.target.checked; store.set('lexicon-color', colorOn);
-  if(!S) return;
-  S.cards.forEach(c=>{ if(c.cont !== undefined) c.art = surrealCard(c.inner, c.cont, c.artId, c.seed).art; });
-  render(); };
 $('soundChk').checked = soundOn;
 $('soundChk').onchange = e=>{ soundOn = e.target.checked; store.set('lexicon-sound', soundOn); };
 $('overlay').onclick = e=>{ if(e.target.id==='overlay') hideDialog(); };
