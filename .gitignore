@@ -1,0 +1,4 @@
+.DS_Store
+# Your own pictures for "Mine" mode stay on this computer and are never published
+assets/custom/*
+!assets/custom/README.md

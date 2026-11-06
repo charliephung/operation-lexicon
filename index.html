@@ -1,0 +1,731 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Operation Lexicon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#efe4c8; --paper-2:#e3d2a8; --card:#f8f1dc; --ink:#2b2418; --ink-soft:#5a4d38; --line:#b9a57c;
+  --red:#a8322a; --red-bg:#d9786b; --blue:#2c4f7c; --blue-bg:#7c9dc8;
+  --neutral:#8a7a56; --neutral-bg:#cdbd96; --burn:#151210; --desk:#5a3f2a; --shadow:rgba(0,0,0,.2);
+  --gutter:clamp(12px,3vw,36px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --paper:#d8caa6; --paper-2:#c9b78c; --card:#efe5c9; --desk:#24180f; --line:#a08c63; }
+}
+:root[data-theme="dark"]{ --paper:#d8caa6; --paper-2:#c9b78c; --card:#efe5c9; --desk:#24180f; --line:#a08c63; }
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; min-height:100vh; min-height:100dvh; color:var(--ink);
+  font-family:"Courier Prime","Courier New",monospace;
+  background:
+    radial-gradient(ellipse at 50% -10%, rgba(255,220,160,.18), transparent 60%),
+    radial-gradient(ellipse at 50% 120%, rgba(0,0,0,.45), transparent 60%),
+    url("assets/wood.png"), var(--desk);
+  background-blend-mode:normal, normal, multiply, normal;
+  padding:calc(34px + env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 32px max(16px, env(safe-area-inset-left));
+}
+
+/* ---------- folder ---------- */
+.folder{
+  max-width:1760px; margin:0 auto; position:relative;
+  background:url("assets/paper.png"), linear-gradient(180deg,var(--paper),var(--paper-2));
+  border-radius:4px 14px 6px 6px; padding:24px var(--gutter) 22px;
+  box-shadow:0 18px 40px rgba(0,0,0,.5), inset 0 0 90px rgba(120,90,40,.28);
+}
+.folder::before{
+  content:"CLASSIFIED"; position:absolute; top:-26px; left:clamp(16px,4vw,40px);
+  background:var(--paper); padding:5px 22px 4px; border-radius:8px 8px 0 0;
+  font-family:"Special Elite",monospace; letter-spacing:.2em; font-size:13px; color:var(--ink-soft);
+}
+.paperclip{position:absolute; top:-14px; left:46%; width:18px; height:54px; border:3px solid #8f8f8f; border-radius:10px; box-shadow:1px 1px 0 rgba(0,0,0,.3)}
+.paperclip::after{content:""; position:absolute; inset:6px 2px 10px; border:3px solid #8f8f8f; border-top:none; border-radius:0 0 8px 8px}
+
+header{display:flex; flex-wrap:wrap; gap:12px 24px; align-items:center; justify-content:space-between; border-bottom:2px dashed var(--line); padding-bottom:14px; margin-bottom:14px}
+.brand{display:flex; align-items:center; gap:12px; min-width:0}
+.brand svg{width:clamp(40px,6vw,58px); height:auto; flex:none; fill:var(--ink); opacity:.85}
+h1{font-family:"Special Elite",monospace; font-weight:400; margin:0; font-size:clamp(24px,4.2vw,40px); letter-spacing:.04em; line-height:1}
+.subtitle{margin:4px 0 0; color:var(--ink-soft); font-size:12px; letter-spacing:.14em; text-transform:uppercase}
+.score{display:flex; gap:12px; font-family:"Special Elite",monospace; font-size:15px}
+.score .pill{padding:6px 12px; border:2px solid currentColor; border-radius:3px; transform:rotate(-1.5deg); background:rgba(255,255,255,.25); white-space:nowrap}
+.score .r{color:var(--red)} .score .b{color:var(--blue); transform:rotate(1.5deg)}
+
+/* ---------- status + clue ---------- */
+.status{display:flex; flex-wrap:wrap; gap:6px 20px; align-items:center; justify-content:space-between; margin-bottom:12px}
+.turn{font-family:"Special Elite",monospace; font-size:clamp(17px,2.4vw,24px)}
+.turn .team-red{color:var(--red)} .turn .team-blue{color:var(--blue)}
+.remaining{display:flex; gap:14px; font-weight:700; font-size:14px}
+.remaining .r{color:var(--red)} .remaining .b{color:var(--blue)}
+.dot{display:inline-block; width:10px; height:10px; border-radius:50%; background:currentColor; margin-right:6px; vertical-align:0}
+
+.clue-bar{display:flex; flex-wrap:wrap; gap:8px; align-items:center; background:rgba(255,255,255,.4); border:1px solid var(--line); padding:10px 12px; margin-bottom:14px; border-radius:3px; border-left:6px solid var(--team-color, var(--ink))}
+.clue-bar label{font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft); flex:1 0 100%}
+input,select,button{font:inherit; color:var(--ink)}
+input[type=text]{flex:1 1 160px; min-width:0; min-height:42px; padding:8px 10px; background:#fbf6e6; border:1px solid var(--line); border-radius:2px; text-transform:uppercase; letter-spacing:.06em; font-size:16px}
+select{min-height:42px; padding:8px; background:#fbf6e6; border:1px solid var(--line); border-radius:2px; font-size:16px}
+button{cursor:pointer; min-height:42px; padding:8px 14px; background:#fbf6e6; border:2px solid var(--ink); border-radius:2px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; font-size:13px; box-shadow:2px 2px 0 var(--ink); display:inline-flex; align-items:center; justify-content:center; gap:8px; touch-action:manipulation}
+button svg{width:20px; height:20px; fill:currentColor}
+@media (hover:hover){ button:hover{transform:translate(-1px,-1px); box-shadow:3px 3px 0 var(--ink)} }
+button:active{transform:translate(1px,1px); box-shadow:0 0 0 var(--ink)}
+button.primary{background:var(--ink); color:var(--paper)}
+.active-clue{font-family:"Special Elite",monospace; font-size:clamp(15px,2.2vw,19px); color:var(--ink-soft); flex:1 1 auto; min-width:0; overflow-wrap:anywhere}
+.active-clue small{display:inline-block; font-family:"Courier Prime",monospace; font-size:13px; color:var(--ink-soft); margin-left:8px}
+
+/* ---------- layout ---------- */
+.layout{display:grid; grid-template-columns:minmax(0,1fr) 290px; gap:clamp(22px,2.4vw,40px); align-items:start}
+
+/* ---------- board ---------- */
+.board-wrap{container-type:inline-size}
+.board{display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:clamp(4px,1.3cqi,18px)}
+.card{
+  position:relative; aspect-ratio:1.5/1; padding:4px; overflow:hidden;
+  background:url("assets/paper.png"), var(--card); border:1px solid var(--line); border-radius:3px;
+  box-shadow:2px 3px 0 var(--shadow); cursor:pointer; min-height:0;
+  display:flex; align-items:center; justify-content:center; text-transform:uppercase;
+  font-family:"Courier Prime",monospace; font-weight:700; letter-spacing:.03em; line-height:1.05; text-align:center;
+  font-size:clamp(8px,2.9cqi,19px); transition:transform .12s ease, background-color .25s ease;
+}
+.card.long{font-size:clamp(7px,2.35cqi,16px); letter-spacing:0}
+.card.xl{font-size:clamp(6.5px,2cqi,14px); letter-spacing:0}
+.card::before{content:""; position:absolute; left:10%; right:10%; bottom:18%; border-bottom:1px solid rgba(0,0,0,.14)}
+.card:nth-child(3n){transform:rotate(-.6deg)} .card:nth-child(4n){transform:rotate(.5deg)}
+@media (hover:hover){ .card:hover:not(.revealed){transform:translateY(-2px) rotate(0); box-shadow:3px 6px 0 var(--shadow)} }
+.card:focus-visible{outline:3px solid var(--ink); outline-offset:2px}
+.card .word{position:relative; z-index:1; max-width:100%; overflow-wrap:anywhere}
+.card .art{position:absolute; inset:8% 0 4%; margin:auto; height:88%; width:auto; opacity:0; transition:opacity .3s}
+.card .art path{fill:currentColor}
+.card .tag{position:absolute; top:5%; right:5%; width:clamp(10px,2.6cqi,20px); height:auto; opacity:0}
+.card .tag path{fill:currentColor}
+
+.card.revealed{cursor:default}
+.card.revealed.red{background-color:var(--red-bg); color:#3a0e0a}
+.card.revealed.blue{background-color:var(--blue-bg); color:#0d1e33}
+.card.revealed.neutral{background-color:var(--neutral-bg); color:#4d4230}
+.card.revealed.burn{background-color:var(--burn); background-image:none; color:#e9dcc0}
+.card.revealed .art{opacity:.3}
+/* picture mode */
+.card.pic{aspect-ratio:1.4/1; color:var(--ink)}
+.card.pic::before{display:none}
+.card .picture{position:relative; z-index:1; width:74%; height:74%; transition:opacity .25s}
+.card.revealed .picture{opacity:.38}
+.card.pic.revealed.burn .picture{opacity:.5}
+.card.surreal{padding:0; background:var(--card)}
+.card.photo{background:linear-gradient(110deg,var(--card) 30%,var(--paper-2) 50%,var(--card) 70%) 0 0/300% 100%; animation:loading 1.4s linear infinite}
+.card.photo.loaded{animation:none; background:var(--card)}
+.card.photo.failed::after{content:"picture unavailable"; position:absolute; inset:auto 0 40% 0; font-size:11px; color:var(--ink-soft); text-transform:none; letter-spacing:0}
+@keyframes loading{to{background-position:-300% 0}}
+.card .scene{position:absolute; inset:0; width:100%; height:100%; display:block; object-fit:cover; transition:opacity .3s, filter .3s}
+.card.surreal.revealed .scene{filter:grayscale(1) contrast(.85); opacity:.32; mix-blend-mode:multiply}
+.card.surreal.revealed.burn .scene{mix-blend-mode:screen; opacity:.28}
+/* Mine mode: whole picture with a margin; revealed cards get a team-color overlay */
+.card.custom .scene{inset:auto; top:6%; left:5%; width:90%; height:88%; object-fit:contain}
+.card.custom.revealed .scene{filter:none; opacity:1; mix-blend-mode:normal}
+.card.custom.revealed::after{content:""; position:absolute; inset:0; z-index:1; pointer-events:none; opacity:.62}
+.card.custom.revealed.red::after{background:var(--red)}
+.card.custom.revealed.blue::after{background:var(--blue)}
+.card.custom.revealed.neutral::after{background:var(--neutral-bg); opacity:.7}
+.card.custom.revealed.burn::after{background:var(--burn); opacity:.8}
+.card.surreal .tag{z-index:3; background:var(--card); border-radius:50%; padding:3px; width:clamp(16px,3.6cqi,28px); top:4%; right:4%}
+.card.revealed .word{position:absolute; left:4%; right:4%; bottom:5%; opacity:.75; font-size:.72em}
+.card.revealed::before{display:none}
+.card .stamp .short{display:none}
+.card .stamp{
+  position:absolute; left:8%; right:8%; top:42%; z-index:2; transform:translateY(-50%) rotate(-12deg); text-align:center;
+  font-family:"Special Elite",monospace; font-weight:400; font-size:clamp(6px,1.9cqi,13px); letter-spacing:.12em;
+  border:2px solid currentColor; padding:2px 3px; opacity:.9; pointer-events:none; animation:stampIn .25s ease-out; white-space:nowrap; overflow:hidden; text-overflow:clip
+}
+@keyframes stampIn{from{transform:translateY(-50%) rotate(-12deg) scale(2.2); opacity:0} to{opacity:.9}}
+/* spymaster key */
+.spy .card:not(.revealed){cursor:not-allowed}
+/* spymaster key: unrevealed cards become solid team colors */
+.spy .card:not(.revealed) .tag, .spy .card:not(.revealed)::before{display:none}
+.spy .card:not(.revealed).red{background:var(--red)}
+.spy .card:not(.revealed).blue{background:var(--blue)}
+.spy .card:not(.revealed).neutral{background:var(--neutral-bg)}
+.spy .card:not(.revealed).burn{background:var(--burn)}
+.spy .card:not(.revealed).red,.spy .card:not(.revealed).blue,.spy .card:not(.revealed).burn{color:#fbf3e0}
+.spy .card:not(.revealed).neutral{color:#3f3523}
+/* keep the picture readable as a one-color silhouette on top of the fill */
+.spy .card.surreal:not(.revealed) .scene{filter:grayscale(1) contrast(1.6) brightness(1.1); mix-blend-mode:multiply; opacity:.5}
+.spy .card.surreal:not(.revealed).red .scene,.spy .card.surreal:not(.revealed).blue .scene,.spy .card.surreal:not(.revealed).burn .scene{filter:grayscale(1) invert(1) contrast(1.6); mix-blend-mode:screen; opacity:.55}
+.spy-banner{display:none; text-align:center; margin-bottom:10px; padding:6px; background:var(--burn); color:var(--paper); letter-spacing:.18em; font-size:12px; font-family:"Special Elite",monospace}
+.spy:not(.over) .spy-banner{display:block}
+
+/* ---------- side panel ---------- */
+aside{border-left:2px dashed var(--line); padding-left:18px; display:flex; flex-direction:column; gap:16px}
+aside h2{font-family:"Special Elite",monospace; font-weight:400; font-size:17px; margin:0 0 8px; letter-spacing:.08em}
+details.logbox summary{list-style:none; cursor:default}
+details.logbox summary::-webkit-details-marker{display:none}
+.log{list-style:none; margin:0; padding:0; max-height:min(360px,45vh); overflow:auto; font-size:14px}
+.log a{color:inherit}
+.credits-box summary{cursor:pointer}
+.credits-box summary h2::after{content:" ▾"; font-size:13px}
+.credits-box:not([open]) summary h2::after{content:" ▸"}
+.log li{padding:6px 0; border-bottom:1px dotted var(--line)}
+.log .who{font-weight:700} .log .who.red{color:var(--red)} .log .who.blue{color:var(--blue)}
+.log .guesses{display:block; font-size:12px; color:var(--ink-soft); margin-top:2px; overflow-wrap:anywhere}
+.log .empty{color:var(--ink-soft); font-style:italic}
+.controls{display:flex; flex-direction:column; gap:8px}
+.mode{display:grid; grid-template-columns:repeat(3,1fr); gap:0}
+.mode button{font-size:11px; letter-spacing:.04em}
+.mode button{box-shadow:none; border-radius:0}
+.mode button{padding-left:6px; padding-right:6px}
+.mode button:not(:first-child){border-left-width:0}
+.mode button[aria-pressed="true"]{background:var(--ink); color:var(--paper)}
+.controls label{display:flex; align-items:center; gap:8px; font-size:14px; min-height:36px}
+.controls input[type=checkbox]{width:18px; height:18px; accent-color:var(--ink)}
+
+footer.credits{margin-top:18px; padding-top:10px; border-top:1px dotted var(--line); font-size:11px; color:var(--ink-soft); line-height:1.5}
+footer.credits a{color:inherit}
+
+/* ---------- dialogs ---------- */
+.overlay{position:fixed; inset:0; background:rgba(20,14,8,.72); display:none; align-items:center; justify-content:center; padding:16px; z-index:10}
+.overlay.show{display:flex}
+.dialog{background:url("assets/paper.png"), var(--paper); max-width:440px; width:100%; max-height:calc(100dvh - 32px); overflow:auto; padding:clamp(18px,4vw,28px); border-radius:3px; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.dialog h3{font-family:"Special Elite",monospace; font-weight:400; font-size:clamp(22px,5vw,28px); margin:0 0 10px}
+.dialog p{margin:0 0 18px; color:var(--ink-soft)}
+.dialog .btns{display:flex; gap:10px; justify-content:center; flex-wrap:wrap}
+.dialog .hero{width:72px; height:72px; margin:0 auto 6px; display:block}
+.dialog .hero path{fill:currentColor}
+.big-stamp{display:inline-block; font-family:"Special Elite",monospace; font-size:clamp(20px,6vw,30px); letter-spacing:.15em; border:4px solid currentColor; padding:6px 16px; transform:rotate(-6deg); margin-bottom:14px}
+.toast{position:fixed; bottom:calc(20px + env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%); background:var(--ink); color:var(--paper); padding:10px 18px; border-radius:3px; font-size:14px; opacity:0; transition:opacity .2s; pointer-events:none; z-index:20; width:max-content; max-width:calc(100% - 32px); text-align:center}
+.toast.show{opacity:1}
+
+/* ---------- responsive ---------- */
+/* tablet: side panel drops below the board */
+@media (max-width:900px){
+  .layout{grid-template-columns:minmax(0,1fr)}
+  aside{border-left:none; padding-left:0; border-top:2px dashed var(--line); padding-top:14px; display:grid; grid-template-columns:minmax(0,1.4fr) minmax(0,1fr); gap:18px}
+}
+/* phone */
+@media (max-width:600px){
+  body{padding-top:calc(32px + env(safe-area-inset-top)); padding-left:max(8px, env(safe-area-inset-left)); padding-right:max(8px, env(safe-area-inset-right))}
+  .folder{padding:18px 12px 16px; border-radius:4px 10px 4px 4px}
+  .paperclip{display:none}
+  header{gap:10px; padding-bottom:10px; margin-bottom:10px}
+  .brand svg{width:36px}
+  .subtitle{font-size:11px}
+  .score{width:100%; justify-content:space-between}
+  .score .pill{flex:1; text-align:center; padding:5px 8px; font-size:14px}
+  .status{margin-bottom:10px}
+  .remaining{width:100%; justify-content:space-between; font-size:13px}
+  .clue-bar{padding:8px}
+  .clue-bar .active-clue{flex:1 0 100%}
+  .clue-bar button{flex:1}
+  .card{aspect-ratio:1/1.05; padding:3px; box-shadow:1px 2px 0 var(--shadow)}
+  .card:nth-child(n){transform:none}
+  .card.revealed .word{font-size:.68em}
+  .card.pic{aspect-ratio:1/1}
+  .card .picture{width:82%; height:82%}
+  .card .stamp{font-size:clamp(7px,2.4cqi,12px); left:12%; right:12%}
+  .card .stamp .full{display:none} .card .stamp .short{display:inline}
+  aside{grid-template-columns:minmax(0,1fr)}
+  details.logbox summary{cursor:pointer}
+  details.logbox summary h2::after{content:" ▾"; font-size:13px}
+  details.logbox:not([open]) summary h2::after{content:" ▸"}
+  .controls{display:grid; grid-template-columns:1fr 1fr; gap:8px}
+  .controls #spyBtn,.controls .mode{grid-column:1/-1}
+  .controls label{grid-column:1/-1; justify-content:center}
+}
+/* very narrow phones */
+@media (max-width:360px){
+  .card{aspect-ratio:1/1.2}
+  .score .pill{font-size:13px}
+}
+/* landscape phones: keep the board on one screen */
+@media (max-height:500px) and (orientation:landscape){
+  body{padding-top:28px}
+  .layout{grid-template-columns:minmax(0,1fr) 220px}
+  aside{border-top:none; border-left:2px dashed var(--line); padding:0 0 0 14px; display:flex}
+  .card{aspect-ratio:2.1/1}
+  .card.pic{aspect-ratio:1.7/1}
+  .folder{padding-top:14px}
+  header{margin-bottom:8px; padding-bottom:8px; flex-wrap:nowrap}
+  .brand svg,.subtitle,.paperclip{display:none}
+  h1{font-size:22px}
+  .status{margin-bottom:6px}
+  .clue-bar{padding:6px 8px; margin-bottom:8px}
+}
+/* large screens: bigger layout, same font sizes */
+@media (min-width:1200px){
+  body{padding-left:24px; padding-right:24px}
+  .folder{padding:30px clamp(28px,2.6vw,52px) 26px}
+  .brand svg{width:66px}
+  header{padding-bottom:18px; margin-bottom:18px}
+  .status{margin-bottom:16px}
+  .clue-bar{padding:14px 18px; margin-bottom:20px}
+  button{min-height:50px; padding:10px 20px}
+  .score .pill{padding:9px 18px}
+  aside{gap:22px}
+  .card.pic{aspect-ratio:1.5/1}
+}
+@media (prefers-reduced-motion:reduce){ *{animation:none!important; transition:none!important} }
+</style>
+</head>
+<body>
+<div class="folder" id="app">
+  <span class="paperclip" aria-hidden="true"></span>
+  <header>
+    <div class="brand">
+      <svg viewBox="0 0 512 512" aria-hidden="true" id="logo"></svg>
+      <div>
+        <h1>Operation Lexicon</h1>
+        <p class="subtitle">Field dossier · Round <span id="roundNo">1</span></p>
+      </div>
+    </div>
+    <div class="score">
+      <span class="pill r">RED <span id="scoreRed">0</span></span>
+      <span class="pill b">BLUE <span id="scoreBlue">0</span></span>
+    </div>
+  </header>
+
+  <div class="status">
+    <div class="turn" id="turnText"></div>
+    <div class="remaining">
+      <span class="r"><span class="dot"></span>Red left: <span id="leftRed"></span></span>
+      <span class="b"><span class="dot"></span>Blue left: <span id="leftBlue"></span></span>
+    </div>
+  </div>
+
+  <div class="clue-bar" id="clueBar"></div>
+
+  <div class="layout">
+    <section class="board-wrap">
+      <div class="spy-banner">SPYMASTER KEY VISIBLE · OPERATIVES LOOK AWAY</div>
+      <div class="board" id="board"></div>
+    </section>
+    <aside>
+      <details class="logbox" id="logBox" open>
+        <summary><h2>Revealed cards</h2></summary>
+        <ul class="log" id="log"></ul>
+      </details>
+      </details>
+      <div>
+        <h2>Controls</h2>
+        <div class="controls">
+          <button id="spyBtn"><svg viewBox="0 0 512 512" id="keyIcon"></svg><span>Show spymaster key</span></button>
+          <button id="newBtn">New round</button>
+          <button id="resetScoreBtn">Reset scores</button>
+          <div class="mode" role="group" aria-label="Card type"><button id="modePic" aria-pressed="true">Art</button><button id="modeMine" aria-pressed="false">Mine</button><button id="modeWord" aria-pressed="false">Words</button></div>
+          <label><input type="checkbox" id="colorChk"> Color pictures</label>
+          <label><input type="checkbox" id="soundChk" checked> Sound effects</label>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <footer class="credits">
+    Card pictures from <a href="https://github.com/microsoft/fluentui-emoji" target="_blank" rel="noopener">Fluent Emoji</a> (High Contrast &amp; Flat) by Microsoft, MIT License. Interface icons by Lorc, Delapouite &amp; contributors, <a href="https://game-icons.net" target="_blank" rel="noopener">game-icons.net</a>, CC BY 3.0. Paper &amp; wood textures from <a href="https://www.transparenttextures.com" target="_blank" rel="noopener">transparenttextures.com</a>.
+  </footer>
+</div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="grain" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" stitchTiles="stitch"/>
+    <feColorMatrix values="0 0 0 0 .1  0 0 0 0 .08  0 0 0 0 .05  0 0 0 .55 0"/>
+  </filter>
+</svg>
+<div class="overlay" id="overlay"><div class="dialog" id="dialog" role="dialog" aria-modal="true"></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="assets/pictures.js"></script>
+<script src="assets/containers.js"></script>
+<script src="assets/color.js"></script>
+<script src="assets/custom/list.js" onerror="this.remove()"></script>
+<script>
+const ICONS = {"agent": "<path fill=\"currentColor\" d=\"M218 19c-1 0-2.76.52-5.502 3.107c-2.742 2.589-6.006 7.021-9.191 12.76c-6.37 11.478-12.527 28.033-17.666 45.653c-4.33 14.844-7.91 30.457-10.616 44.601c54.351 24.019 107.599 24.019 161.95 0c-2.706-14.144-6.286-29.757-10.616-44.601c-5.139-17.62-11.295-34.175-17.666-45.653c-3.185-5.739-6.45-10.171-9.191-12.76C296.76 19.52 295 19 294 19c-6.5 0-9.092 1.375-10.822 2.85c-1.73 1.474-3.02 3.81-4.358 7.34s-2.397 8.024-5.55 12.783C270.116 46.73 263.367 51 256 51c-7.433 0-14.24-4.195-17.455-8.988c-3.214-4.794-4.26-9.335-5.576-12.881s-2.575-5.867-4.254-7.315C227.035 20.37 224.5 19 218 19m-46.111 124.334c-1.41 9.278-2.296 17.16-2.57 22.602c6.61 5.087 17.736 10.007 31.742 13.302C217.18 183.031 236.6 185 256 185s38.82-1.969 54.94-5.762c14.005-3.295 25.13-8.215 31.742-13.302c-.275-5.443-1.161-13.324-2.57-22.602c-55.757 23.332-112.467 23.332-168.223 0M151.945 155.1c-19.206 3.36-36.706 7.385-51.918 11.63c-19.879 5.548-35.905 11.489-46.545 16.57c-5.32 2.542-9.312 4.915-11.494 6.57c-.37.28-.247.306-.445.546c.333.677.82 1.456 1.73 2.479c1.973 2.216 5.564 4.992 10.627 7.744c10.127 5.504 25.944 10.958 45.725 15.506C139.187 225.24 194.703 231 256 231s116.813-5.76 156.375-14.855c19.78-4.548 35.598-10.002 45.725-15.506c5.063-2.752 8.653-5.528 10.627-7.744c.91-1.023 1.397-1.802 1.73-2.479c-.198-.24-.075-.266-.445-.547c-2.182-1.654-6.174-4.027-11.494-6.568c-10.64-5.082-26.666-11.023-46.545-16.57c-15.212-4.246-32.712-8.272-51.918-11.631c.608 5.787.945 10.866.945 14.9v3.729l-2.637 2.634c-10.121 10.122-25.422 16.191-43.302 20.399C297.18 200.969 276.6 203 256 203s-41.18-2.031-59.06-6.238s-33.182-10.277-43.303-20.399L151 173.73V170c0-4.034.337-9.113.945-14.9m1.094 88.205C154.558 308.17 200.64 359 256 359s101.442-50.83 102.96-115.695a749 749 0 0 1-19.284 2.013c-1.33 5.252-6.884 25.248-15.676 30.682c-13.61 8.412-34.006 7.756-48 0c-7.986-4.426-14.865-19.196-18.064-27.012c-.648.002-1.287.012-1.936.012c-.65 0-1.288-.01-1.936-.012c-3.2 7.816-10.078 22.586-18.064 27.012c-13.994 7.756-34.39 8.412-48 0c-8.792-5.434-14.346-25.43-15.676-30.682a749 749 0 0 1-19.285-2.013M137.4 267.209c-47.432 13.23-77.243 32.253-113.546 61.082c42.575 4.442 67.486 21.318 101.265 48.719l16.928 13.732l-21.686 2.211c-13.663 1.393-28.446 8.622-39.3 17.3c-5.925 4.738-10.178 10.06-12.957 14.356c44.68 5.864 73.463 10.086 98.011 20.147c18.603 7.624 34.81 18.89 53.737 35.781l5.304-23.576c-1.838-9.734-4.134-19.884-6.879-30.3c-5.12-7.23-9.698-14.866-13.136-22.007C201.612 397.326 199 391 199 384c0-3.283.936-6.396 2.428-9.133a480 480 0 0 0-6.942-16.863c-29.083-19.498-50.217-52.359-57.086-90.795m237.2 0c-6.87 38.436-28.003 71.297-57.086 90.795a481 481 0 0 0-6.942 16.861c1.493 2.737 2.428 5.851 2.428 9.135c0 7-2.612 13.326-6.14 20.654c-3.44 7.142-8.019 14.78-13.14 22.01c-2.778 10.547-5.099 20.82-6.949 30.666l5.14 23.42c19.03-17.01 35.293-28.338 53.974-35.994c24.548-10.06 53.33-14.283 98.011-20.147c-2.78-4.297-7.032-9.618-12.957-14.355c-10.854-8.679-25.637-15.908-39.3-17.3l-21.686-2.212l16.928-13.732c33.779-27.4 58.69-44.277 101.265-48.719c-36.303-28.829-66.114-47.851-113.546-61.082M256 377c-8 0-19.592.098-28.234 1.826c-4.321.864-7.8 2.222-9.393 3.324c-1.592 1.103-1.373.85-1.373 1.85s1.388 6.674 4.36 12.846c2.971 6.172 7.247 13.32 11.964 19.924s9.925 12.699 14.465 16.806c4.075 3.687 7.842 5.121 8.211 5.377c.37-.256 4.136-1.69 8.21-5.377c4.54-4.107 9.749-10.202 14.466-16.806s8.993-13.752 11.965-19.924S295 385 295 384s.22-.747-1.373-1.85c-1.593-1.102-5.072-2.46-9.393-3.324C275.592 377.098 264 377 256 377m0 61.953c-.042.03-.051.047 0 .047s.042-.018 0-.047m-11.648 14.701L235.047 495h41.56l-9.058-41.285C264.162 455.71 260.449 457 256 457c-4.492 0-8.235-1.316-11.648-3.346\"/>", "logo": "<path fill=\"currentColor\" d=\"M254.1 18.63c-81.4 0-231.43 155.97-171.63 300.77c8 25.3 27.83 50.4 49.13 77.1c24.4 30.6 51.6 63.2 68.7 96.9h20.5c-18.1-39.8-48.5-75.9-74.6-108.6c-27.4-34.3-48.73-65.2-48.73-87.9c.1-9.1 2.23-18.1 5.53-26.3c23-61.4 114-119.7 148.5-135l3.6-2l3.9 1.3c60.9 20.9 129.3 66.7 154 135.7c4.1 11.7 5.9 18 5.6 27.3c-.5 15.8-24.5 54.7-55 88.7c-29.1 32.4-62.4 67.7-80 106.7h20.5c16.8-32.2 46.2-64 73.3-94.2c23.2-25.6 45.3-50 54.9-74.8c52.9-124-99.2-305.67-178.2-305.67m.8 135.47c-38.7 21.5-85.1 52.2-113.7 88.2c9.7 83 59 146.1 118.3 146.1c59.2 0 108.3-62.7 118.2-145.3c-28.9-42.1-78-72.9-122.8-89m-58.3 83h2.4c13.1.1 26.1 2.7 39.1 7.4c-16.8 40.6-59 42-78.1 0c12.2-4.8 24.4-7.2 36.6-7.4m124.9 0c13-.1 26 2.3 39.1 7.4c-19.2 42-61.3 40.6-78.2 0c13.1-4.7 26.1-7.3 39.1-7.4\"/>", "civilian": "<path fill=\"currentColor\" d=\"M250.882 22.802c-23.366 3.035-44.553 30.444-44.553 65.935c0 19.558 6.771 36.856 16.695 48.815l11.84 14.263l-18.217 3.424c-12.9 2.425-22.358 9.24-30.443 20.336c-8.085 11.097-14.266 26.558-18.598 44.375c-7.843 32.28-9.568 71.693-9.842 106.436h42.868l11.771 157.836c29.894 6.748 61.811 6.51 90.602.025l10.414-157.86h40.816c-.027-35.169-.477-75.126-7.584-107.65c-3.918-17.934-9.858-33.372-18.04-44.343c-8.185-10.97-18.08-17.745-32.563-19.989l-18.592-2.88l11.736-14.704c9.495-11.897 15.932-28.997 15.932-48.082c0-37.838-23.655-65.844-49.399-65.844z\"/>", "burn": "<path fill=\"currentColor\" d=\"M425.344 22.22c-9.027.085-18.7 5.826-24.344 19.405c-11.143 26.803-31.93 59.156-58.563 93.47a141.2 141.2 0 0 1 27.5 30.31c35.1-26.57 68.882-46.81 98.125-56.75c44.6-15.16 12.02-69.72-35.343-35.343c26.91-27.842 11.107-51.27-7.376-51.093zm-341.22.03c-18.5.378-37.604 23.962-16.343 49.875C31.523 38.635-.802 85.48 37.095 102.813c28.085 12.844 62.54 35.66 99.062 64.343c8.125-12.5 18.207-23.61 29.78-32.937c-26.782-35.743-48.44-69.835-61.78-98.47c-4.515-9.69-12.22-13.66-20.03-13.5zm169.5 99.688c-67.104 0-121.31 54.21-121.31 121.312c0 44.676 24.04 83.613 59.905 104.656v56.406h18.718v-47.468a120 120 0 0 0 16.093 4.78v42.688h18.69v-40.03a124 124 0 0 0 15.749 0v40.03h18.686v-42.687a121 121 0 0 0 16.094-4.78v47.467h18.688V347.97c35.92-21.03 60-60.003 60-104.72c0-67.105-54.208-121.313-121.313-121.313zm-66.874 88.218c19.88 0 36 16.12 36 36s-16.12 36-36 36s-36-16.12-36-36s16.12-36 36-36m133.563 0c19.878 0 36 16.12 36 36s-16.122 36-36 36c-19.88 0-36-16.12-36-36s16.12-36 36-36m-66.72 52.344l29.938 48.188h-59.874l29.938-48.188zm-107.28 70.563c-40.263 32.472-78.546 58.41-109.22 72.437c-37.896 17.334-5.57 64.146 30.688 30.656c-30.237 36.854 21.167 69.05 36.376 36.406c15.072-32.352 40.727-71.7 72.438-112.5a141 141 0 0 1-30.28-27zm213.156 1.718a141 141 0 0 1-27.908 24.69c31.846 39.39 56.82 76.862 69.438 107.217c17.203 41.383 71.774 9.722 31.72-31.718c47.363 34.376 79.94-20.185 35.342-35.345c-32.146-10.926-69.758-34.3-108.593-64.844z\"/>", "key": "<path fill=\"currentColor\" d=\"M239.125 97.438c-8.085.263-14.998 3.486-22.125 9.062c-10.136 7.93-19.822 21.153-28.906 36.47c-12.06 20.333-22.702 43.987-35.188 63.686l1.156.72c-.418.68-.383.62-.25 1.374c.134.754.767 2.354 2.407 4.5c3.277 4.293 10.342 10.21 19.936 16.156c19.188 11.89 48.29 24.49 78.813 34.906c30.52 10.418 62.6 18.744 87.874 22.625c12.637 1.94 23.6 2.753 31.406 2.313c6.83-.385 10.57-2.374 11.094-2.47c2.313-12.74 5.12-26.273 7.437-40.03c5.32-31.57 7.318-63.1-.686-79.188c-7.48-15.038-17.617-20.69-29.03-22.375c-7.012-1.034-14.537-.068-21.627 1.97c8.783 5.46 18.177 9.676 28.594 11.624l-3.436 18.376c-29.7-5.554-51.25-24.54-69.344-42s-33.43-33.012-47.156-36.437c-3.314-.828-6.41-1.236-9.344-1.282a31 31 0 0 0-1.625 0M51.72 172.156c-3.565.077-6.743.487-9.532 1.22c-11.158 2.926-17.707 9.42-21.282 27.343c-5.598 28.066 2.315 52.298 19.938 74.874s45.243 42.83 77.625 59.937c62.247 32.887 141.57 54.053 199.155 63.19l7.594-18.064l4.342-10.28l9.344 6.062l54.25 35.062c32.376 2.315 60.15-1.828 77.78-10.563c9.02-4.468 15.296-9.976 18.94-16.062c3.642-6.086 5.003-12.87 3.437-21.72c-4.446-25.12-12.418-39.6-23.375-49.31c-10.958-9.712-25.828-15.125-45.313-19.22c-6.452-1.356-13.402-2.563-20.75-3.75c-2.82 16.205-4.812 30.047-4.188 38.344c.416 5.53-2.52 11.542-6.625 14.717c-4.104 3.176-8.748 4.535-13.843 5.407c-10.19 1.743-22.893 1.178-37.908-.75c-30.03-3.857-68.82-13.617-106.125-26.375c-37.304-12.76-72.902-28.365-96.687-44.908c-11.892-8.27-21.073-16.588-25.813-26.78c-2.37-5.097-3.465-10.944-2.28-16.688c1.183-5.744 4.534-10.91 9.156-15.094c5.593-5.063 11.163-12.628 16.78-21.625c-15.758-6.912-30.355-12.82-43.468-17.125c-16.417-5.39-30.464-8.075-41.156-7.844zm88.968 51.47c-2.743 3.246-5.603 6.26-8.594 8.968c-2.423 2.193-3.146 3.77-3.406 5.03c-.26 1.262-.158 2.677.937 5.032c2.19 4.71 9.037 11.992 19.563 19.313c21.05 14.64 55.74 30.15 92.03 42.56c36.292 12.413 74.398 21.896 102.47 25.5c14.035 1.804 25.686 2.02 32.375.876c2.73-.467 4.262-1.1 4.968-1.47c-.39-6.627.103-14.072 1.095-22.123c-2.2.287-4.467.46-6.813.593c-9.955.562-21.878-.436-35.312-2.5c-26.868-4.126-59.644-12.682-91.063-23.406c-31.418-10.724-61.326-23.52-82.625-36.72c-10.65-6.598-19.196-13.17-24.937-20.686c-.24-.316-.456-.648-.688-.97z\"/>"};
+const svg = (name, cls='') => `<svg class="${cls}" viewBox="0 0 512 512" aria-hidden="true">${ICONS[name]}</svg>`;
+const ART = {red:'agent', blue:'agent', neutral:'civilian', burn:'burn'};
+
+const WORDS = `AFRICA AGENT AIR ALIEN ALPS AMAZON AMBULANCE ANCHOR ANGEL ANT APPLE ARM ARMY ATLANTIS AZTEC BABY BACK BALL BAND BANK BAR BARK BAT BATTERY BEACH BEAR BEAT BED BEIJING BELL BELT BERLIN BERRY BILL BLOCK BOARD BOLT BOMB BOND BOOM BOOT BOTTLE BOW BOX BRIDGE BRUSH BUCK BUFFALO BUG BUGLE BUTTON CALF CANADA CAP CAPITAL CAR CARD CARROT CASINO CAST CAT CELL CENTAUR CENTER CHAIR CHANGE CHARGE CHECK CHEST CHICK CHINA CHOCOLATE CHURCH CIRCLE CLIFF CLOAK CLUB CODE COLD COMIC COMPOUND CONCERT CONDUCTOR CONTRACT COOK COPPER COTTON COURT COVER CRANE CRASH CRICKET CROSS CROWN CYCLE CZECH DANCE DATE DAY DEATH DECK DEGREE DIAMOND DICE DINOSAUR DISEASE DOCTOR DOG DRAFT DRAGON DRESS DRILL DROP DUCK DWARF EAGLE EGYPT EMBASSY ENGINE ENGLAND EUROPE EYE FACE FAIR FALL FAN FENCE FIELD FIGHTER FIGURE FILE FILM FIRE FISH FLUTE FLY FOOT FORCE FOREST FORK FRANCE GAME GAS GENIUS GERMANY GHOST GIANT GLASS GLOVE GOLD GRACE GRASS GREECE GREEN GROUND HAM HAND HAWK HEAD HEART HELICOPTER HIMALAYAS HOLE HOLLYWOOD HONEY HOOD HOOK HORN HORSE HOSPITAL HOTEL ICE ICEBERG INDIA IRON IVORY JACK JAM JET JUPITER KANGAROO KETCHUP KEY KID KING KIWI KNIFE KNIGHT LAB LAP LASER LAWYER LEAD LEMON LEPRECHAUN LIFE LIGHT LIMOUSINE LINE LINK LION LITTER LOCH LOCK LOG LONDON LUCK MAIL MAMMOTH MAPLE MARBLE MARCH MASS MATCH MERCURY MEXICO MICROSCOPE MILLIONAIRE MINE MINT MISSILE MODEL MOLE MOON MOSCOW MOUNT MOUSE MOUTH MUG NAIL NEEDLE NET NIGHT NINJA NOTE NOVEL NURSE NUT OCTOPUS OIL OLIVE OLYMPUS OPERA ORANGE ORGAN PALM PAN PANTS PAPER PARACHUTE PARK PART PASS PASTE PENGUIN PHOENIX PIANO PIE PILOT PIN PIPE PIRATE PISTOL PIT PITCH PLANE PLASTIC PLATE PLATYPUS PLAY PLOT POINT POISON POLE POLICE POOL PORT POST POUND PRESS PRINCESS PUMPKIN PUPIL PYRAMID QUEEN RABBIT RACKET RAY REVOLUTION RING ROBIN ROBOT ROCK ROME ROOT ROSE ROULETTE ROUND ROW RULER SATELLITE SATURN SCALE SCHOOL SCIENTIST SCORPION SCREEN SCUBA SEAL SERVER SHADOW SHAKESPEARE SHARK SHIP SHOE SHOP SHOT SINK SKYSCRAPER SLIP SLUG SMUGGLER SNOW SNOWMAN SOCK SOLDIER SOUL SOUND SPACE SPELL SPIDER SPIKE SPINE SPOT SPRING SPY SQUARE STADIUM STAFF STAR STATE STICK STOCK STRAW STREAM STRIKE STRING SUB SUIT SUPERHERO SWING SWITCH TABLE TABLET TAG TAIL TAP TEACHER TELESCOPE TEMPLE THEATER THIEF THUMB TICK TIE TIME TOKYO TOOTH TORCH TOWER TRACK TRAIN TRIANGLE TRIP TRUNK TUBE TURKEY UNDERTAKER UNICORN VACUUM VAN VET WAKE WALL WAR WASHER WASHINGTON WATCH WATER WAVE WEB WELL WHALE WHIP WIND WITCH WORM YARD VOLCANO VIOLIN COMPASS LANTERN TYPEWRITER PASSPORT SUITCASE BINOCULARS CAMERA RADIO TUNNEL HARBOR DESERT JUNGLE ISLAND CASTLE MUSEUM LIBRARY MARKET FACTORY PRISON VAULT SAFE CIPHER MAP FLAG MEDAL SWORD SHIELD ARROW CANNON RIFLE HELMET`.split(/\s+/).filter(Boolean);
+
+
+/* ---------- surreal card generator (original art, built from CC BY icons) ---------- */
+const PALETTES = [
+  ['#f2c14e','#f78154','#2f6f5e','#2b2418','#fff4d6'],
+  ['#a3d5d3','#5b8e7d','#e9893b','#1f2a36','#fbf3e4'],
+  ['#e9c46a','#2a9d8f','#c8553d','#264653','#fdf0d5'],
+  ['#cdb4db','#ffafcc','#4f6db8','#3d2c4e','#fffaf2'],
+  ['#ffcb77','#fe6d73','#118f82','#22333b','#fef9ef'],
+  ['#bde0fe','#8093f1','#d65db1','#1b1b3a','#fff7fd'],
+  ['#f6bd60','#84a59d','#d95d5b','#2f3e46','#f7ede2'],
+  ['#c5dca0','#f9c74f','#3f6c8f','#1d2d44','#fbfbf2'],
+  ['#f4a988','#7b8cb8','#e0b04a','#2d3142','#fff8f0'],
+  ['#e3c9a8','#ccd5ae','#c4553a','#283618','#fefae0'],
+  ['#9ad1d4','#f7d488','#ca3c25','#1d1a31','#fdf6ec'],
+  ['#e8a598','#f6e7cb','#5a7d7c','#232c33','#ffffff'],
+];
+const MONO = ['#f8f1dc','#eadfc1','#16130f','#16130f','#f8f1dc'];
+function mulberry(a){ return ()=>{ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+
+function drawIcon(i, x, y, size, color, {rot=0, flipY=false, opacity=1}={}){
+  const s = size/512, sy = flipY ? -s : s;
+  return `<g transform="translate(${x} ${y}) rotate(${rot}) scale(${s} ${sy}) translate(-256 -256)" color="${color}" opacity="${opacity}">${PICTURES[i].b}</g>`;
+}
+
+const BACKDROPS = {
+  sun(r,P){ const cx=120+r()*260, cy=110+r()*120, rad=70+r()*60;
+    return `<circle cx="${cx}" cy="${cy}" r="${rad}" fill="${P[2]}" opacity=".85"/>
+      <circle cx="${cx}" cy="${cy}" r="${rad+22}" fill="none" stroke="${P[4]}" stroke-width="5" opacity=".7"/>
+      <circle cx="${cx}" cy="${cy}" r="${rad+44}" fill="none" stroke="${P[4]}" stroke-width="2" opacity=".5"/>`; },
+  rays(r,P){ let o=''; const n=14, cx=250, cy=250+r()*40-20;
+    for(let k=0;k<n;k+=2){ const a1=k/n*Math.PI*2, a2=(k+1)/n*Math.PI*2;
+      o+=`<polygon points="${cx},${cy} ${cx+600*Math.cos(a1)},${cy+600*Math.sin(a1)} ${cx+600*Math.cos(a2)},${cy+600*Math.sin(a2)}" fill="${P[4]}" opacity=".28"/>`; }
+    return o; },
+  checker(r,P){ const hy=290; let o=`<rect x="0" y="${hy}" width="500" height="${500-hy}" fill="${P[4]}" opacity=".55"/>`;
+    for(let k=-10;k<=10;k++) o+=`<line x1="250" y1="${hy}" x2="${250+k*70}" y2="500" stroke="${P[3]}" stroke-width="2" opacity=".35"/>`;
+    for(let k=1,y=hy;k<8;k++){ y+=k*6; o+=`<line x1="0" y1="${y}" x2="500" y2="${y}" stroke="${P[3]}" stroke-width="2" opacity=".35"/>`; }
+    return o + `<line x1="0" y1="${hy}" x2="500" y2="${hy}" stroke="${P[3]}" stroke-width="3" opacity=".5"/>`; },
+  waves(r,P){ let o=''; for(let k=0;k<5;k++){ const y=330+k*26, a=10+r()*10, ph=r()*100;
+      let d=`M-20 ${y}`; for(let x=-20;x<=520;x+=40) d+=` Q ${x+20-ph%40} ${y-a} ${x+40} ${y}`;
+      o+=`<path d="${d}" fill="none" stroke="${k%2?P[4]:P[2]}" stroke-width="7" stroke-linecap="round" opacity=".55"/>`; }
+    return o; },
+  arcs(r,P){ let o=''; const cx=r()<.5?80:420; for(let k=0;k<5;k++)
+      o+=`<circle cx="${cx}" cy="470" r="${300-k*45}" fill="none" stroke="${[P[2],P[4],P[1],P[4],P[2]][k]}" stroke-width="22" opacity=".45"/>`;
+    return o; },
+  dots(r,P){ let o=''; for(let k=0;k<26;k++){ const rad=3+r()*16;
+      o+=`<circle cx="${r()*500}" cy="${r()*500}" r="${rad}" fill="${r()<.5?P[4]:P[2]}" opacity="${.25+r()*.4}"/>`; }
+    return o; },
+  moon(r,P){ const cx=90+r()*320, cy=110+r()*60;
+    return `<circle cx="${cx}" cy="${cy}" r="58" fill="${P[4]}" opacity=".85"/><circle cx="${cx+24}" cy="${cy-12}" r="50" fill="${P[0]}"/>`
+      + Array.from({length:12},()=>`<circle cx="${r()*500}" cy="${r()*220}" r="${1.5+r()*2.5}" fill="${P[4]}" opacity=".8"/>`).join(''); },
+};
+
+const SCENES = [
+  { name:(a,b)=>`${b} inside ${a}`, draw(a,b,r,P){
+      return `<ellipse cx="250" cy="410" rx="120" ry="16" fill="${P[3]}" opacity=".18"/>`
+        + drawIcon(a,250,255,300,P[3]) + drawIcon(b,250,262,118,P[4],{rot:r()*30-15}); } },
+  { name:(a,b)=>`${a} on ${b}`, draw(a,b,r,P){
+      return `<ellipse cx="250" cy="418" rx="110" ry="14" fill="${P[3]}" opacity=".2"/>`
+        + drawIcon(b,250,322,190,P[3]) + drawIcon(a,250,168,128,P[2],{rot:r()*20-10}); } },
+  { name:(a,b)=>`giant ${a}, tiny ${b}`, draw(a,b,r,P){ const left=r()<.5;
+      return drawIcon(a,left?205:295,250,340,P[3],{rot:(r()*16-8)}) + drawIcon(b,left?400:100,370,74,P[2]); } },
+  { name:(a,b)=>`${a} reflected as ${b}`, draw(a,b,r,P){
+      return `<rect x="0" y="262" width="500" height="238" fill="${P[2]}" opacity=".35"/>
+        <line x1="0" y1="262" x2="500" y2="262" stroke="${P[4]}" stroke-width="4"/>`
+        + drawIcon(a,250,178,160,P[3]) + drawIcon(b,250,346,160,P[4],{flipY:true,opacity:.85}); } },
+  { name:(a,b)=>`${b}s orbiting ${a}`, draw(a,b,r,P){ let o=`<circle cx="250" cy="250" r="150" fill="none" stroke="${P[4]}" stroke-width="3" stroke-dasharray="6 10" opacity=".8"/>`;
+      o += drawIcon(a,250,250,175,P[3]); const off=r()*Math.PI;
+      for(let k=0;k<5;k++){ const t=off+k/5*Math.PI*2; o+=drawIcon(b,250+150*Math.cos(t),250+150*Math.sin(t),58,P[2],{rot:t*57.3+90}); }
+      return o; } },
+  { name:(a,b)=>`${a} kaleidoscope`, draw(a,b,r,P){ let o=`<circle cx="250" cy="250" r="185" fill="${P[4]}" opacity=".4"/>`;
+      for(let k=0;k<6;k++){ const t=k/6*Math.PI*2; o+=drawIcon(a,250+105*Math.cos(t),250+105*Math.sin(t),104,k%2?P[2]:P[3],{rot:t*57.3+90}); }
+      return o + `<circle cx="250" cy="250" r="52" fill="${P[3]}"/>` + drawIcon(b,250,250,68,P[4]); } },
+];
+
+const an = w => (/^[aeiou]/i.test(w) ? 'an ' : 'a ') + w;
+const plural = w => /(s|x|z|ch|sh)$/.test(w) ? w + 'es' : /[^aeiou]y$/.test(w) ? w.slice(0,-1) + 'ies' : w + 's';
+
+let colorOn = false;
+const hasColor = () => typeof COLOR_PICS !== 'undefined' && COLOR_PICS.length === PICTURES.length && COLOR_CONTS.length === CONTAINERS.length;
+function surrealCard(inner, cont, id, seed){
+  // "an object inside a container": e.g. a seahorse inside a donut
+  const r = mulberry(seed), P = MONO, C = CONTAINERS[cont];
+  const keys = Object.keys(BACKDROPS), bd = keys[Math.floor(r()*keys.length)];
+  const rot = Math.round(r()*24 - 12), size = 400, k = size/512, si = C.s/512;
+  const art = `<svg class="scene" viewBox="36 36 428 428" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+    <rect x="-300" y="-300" width="1100" height="1100" fill="${P[0]}"/>
+    <g opacity=".1">${BACKDROPS[bd](r,P)}</g>
+    ${colorOn && hasColor() ? `
+    <g transform="translate(250 250) scale(${k}) translate(-256 -256)">${COLOR_CONTS[cont]}</g>
+    <g transform="translate(${C.x} ${C.y}) rotate(${rot}) scale(${si}) translate(-256 -256)">
+      <g transform="translate(256 256) scale(1.14) translate(-256 -256)"><image href="${PICTURES[inner].m}" width="512" height="512" style="filter:drop-shadow(0 6px 10px rgba(0,0,0,.35))"/></g>${COLOR_PICS[inner]}</g>` : `
+    <g transform="translate(250 250) scale(${k}) translate(-256 -256)" color="${C.m ? P[0] : P[3]}">${C.m ? `<image href="${C.m}" width="512" height="512"/><g opacity=".16">${C.b}</g>` : C.b}</g>
+    ${PICTURES[inner].m
+      ? `<g transform="translate(${C.x} ${C.y}) rotate(${rot}) scale(${si}) translate(-256 -256)" color="${P[3]}"><image href="${PICTURES[inner].m}" width="512" height="512"/>${PICTURES[inner].b}</g>`
+      : `<g transform="translate(${C.x} ${C.y}) rotate(${rot}) scale(${si}) translate(-256 -256)" color="${P[4]}"
+       stroke="${P[3]}" stroke-width="${(5/si).toFixed(1)}" stroke-linejoin="round" paint-order="stroke">${PICTURES[inner].b}</g>`}`}
+    <rect x="-300" y="-300" width="1100" height="1100" filter="url(#grain)" opacity=".25"/>
+  </svg>`;
+  return { word: `${PICTURES[inner].n} inside ${an(C.n)}`.toUpperCase(), pic:true, art, inner, cont, seed, artId:id };
+}
+
+
+function photoLoaded(img){ img.closest('.card')?.classList.add('loaded'); }
+
+/* ---------- "Mine": the player's own pictures in assets/custom/ ---------- */
+let customFound = null, customProbe = null;
+function findCustom(){
+  if(typeof CUSTOM_PICS !== 'undefined' && CUSTOM_PICS.length) return Promise.resolve(customFound = CUSTOM_PICS.slice());
+  if(customProbe) return customProbe;
+  // no list.js: look for numbered files 1.jpg, 2.png, ... (stops after 5 missing numbers in a row)
+  const exts = ['jpg','png','jpeg','webp'];
+  const tryOne = n => new Promise(done=>{ let k = 0;
+    const next = ()=>{ if(k >= exts.length) return done(null); const f = `${n}.${exts[k++]}`, img = new Image();
+      img.onload = ()=>done(f); img.onerror = next; img.src = 'assets/custom/' + f; };
+    next(); });
+  return customProbe = (async ()=>{ const found = [];
+    for(let start = 0; start < 5000; start += 20){ // check 20 numbers at a time; stop at the first empty batch
+      const batch = (await Promise.all(Array.from({length:20}, (_,j)=>tryOne(start + j)))).filter(Boolean);
+      found.push(...batch);
+      if(!batch.length && start > 0) break;
+    }
+    return customFound = found; })();
+}
+const customLabel = f => f.replace(/\.[^.]+$/,'').replace(/[_\-]+/g,' ').trim().toUpperCase() || 'PICTURE';
+function dealCustom(){
+  const list = customFound || [];
+  if(list.length < 25){ mode = 'pictures'; syncModeButtons(); return dealSurreal(); }
+  return drawFrom('custom-' + list.length, list.length, 25).map(i=>({ word: customLabel(list[i]), pic:true, custom:true,
+    art:`<img class="scene" src="assets/custom/${encodeURI(list[i])}" alt="" draggable="false" onload="photoLoaded(this)" onerror="this.closest('.card')?.classList.add('failed','loaded')">` }));
+}
+
+let dealNo = 0;
+// decks of unused objects/containers: nothing repeats until every one has been dealt (remembered across reloads)
+function drawFrom(name, size, n){
+  const key = 'lexicon-deck-' + name;
+  let d = store.get(key, null);
+  if(!d || d.size !== size || !Array.isArray(d.left)) d = { size, left: [] };
+  const out = [];
+  while(out.length < n){
+    if(!d.left.length) d.left = shuffle(Array.from({length:size}, (_,i)=>i)).filter(i=>!out.includes(i));
+    out.push(d.left.pop());
+  }
+  store.set(key, d);
+  return out;
+}
+function dealSurreal(){
+  dealNo++;
+  const conts = drawFrom('containers', CONTAINERS.length, 25);
+  const inner = drawFrom('objects', PICTURES.length, 25);
+  for(let k=0;k<25;k++){ // no "pumpkin inside a pumpkin": swap with another card's object
+    if(PICTURES[inner[k]].n === CONTAINERS[conts[k]].n){
+      const j = inner.findIndex((v,m)=>m!==k && PICTURES[v].n !== CONTAINERS[conts[k]].n && PICTURES[inner[k]].n !== CONTAINERS[conts[m]].n);
+      if(j >= 0) [inner[k], inner[j]] = [inner[j], inner[k]];
+    }
+  }
+  return Array.from({length:25}, (_,k)=> surrealCard(inner[k], conts[k], `${dealNo}-${k}`, Math.floor(Math.random()*2**31)));
+}
+
+const $ = id => document.getElementById(id);
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+
+let scores = store.get('lexicon-scores', {red:0, blue:0, round:1});
+let soundOn = store.get('lexicon-sound', true);
+let mode = store.get('lexicon-mode', 'pictures');
+if(typeof PICTURES === 'undefined' || typeof CONTAINERS === 'undefined') mode = mode === 'pictures' ? 'words' : mode;
+let S;
+
+function shuffle(a){ a = a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+const other = t => t === 'red' ? 'blue' : 'red';
+const label = t => t === 'red' ? 'Red' : 'Blue';
+
+function newRound(){
+  const first = Math.random() < .5 ? 'red' : 'blue';
+  const words = mode === 'pictures'
+    ? dealSurreal()
+    : mode === 'custom' ? dealCustom()
+    : shuffle([...new Set(WORDS)]).slice(0,25).map(w=>({word:w}));
+  const types = shuffle([...Array(8).fill(first), ...Array(7).fill(other(first)), ...Array(9).fill('neutral'), 'burn']);
+  S = { cards: words.map((w,i)=>({...w, type:types[i], revealed:false})), mode, turn:first, history:[], over:false, spy:false };
+  render();
+}
+
+/* ---------- sound ---------- */
+let actx;
+function ctx(){ return actx = actx || new (window.AudioContext||window.webkitAudioContext)(); }
+function tone(freq, dur, type='square', vol=.06, when=0){
+  if(!soundOn) return;
+  try{ const a=ctx(), t=a.currentTime+when, o=a.createOscillator(), g=a.createGain();
+    o.type=type; o.frequency.setValueAtTime(freq,t); g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    o.connect(g).connect(a.destination); o.start(t); o.stop(t+dur); }catch(e){}
+}
+function noise(dur=.08, vol=.25){
+  if(!soundOn) return;
+  try{ const a=ctx(), n=a.sampleRate*dur, buf=a.createBuffer(1,n,a.sampleRate), d=buf.getChannelData(0);
+    for(let i=0;i<n;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/n,3);
+    const src=a.createBufferSource(), g=a.createGain(); g.gain.value=vol; src.buffer=buf; src.connect(g).connect(a.destination); src.start(); }catch(e){}
+}
+const sfx = {
+  stamp(){ noise(.09,.35); tone(90,.12,'sine',.2); },
+  good(){ sfx.stamp(); tone(660,.12,'triangle',.08,.08); tone(880,.16,'triangle',.08,.18); },
+  bad(){ sfx.stamp(); tone(220,.25,'sawtooth',.05,.08); },
+  burn(){ noise(.5,.5); tone(110,.8,'sawtooth',.08); tone(55,1,'square',.06,.1); },
+  clue(){ [0,.05,.1,.17].forEach(w=>tone(1200+Math.random()*400,.03,'square',.03,w)); },
+  win(){ [523,659,784,1047].forEach((f,i)=>tone(f,.25,'triangle',.08,i*.13)); }
+};
+
+/* ---------- gameplay ---------- */
+function remaining(team){ return S.cards.filter(c=>c.type===team && !c.revealed).length; }
+
+function reveal(i){
+  if(S.over || S.spy) return;
+  const c = S.cards[i];
+  if(c.revealed) return;
+  c.revealed = true;
+  S.history.push({i, turn:S.turn});
+
+  if(c.type === 'burn'){ sfx.burn(); return endGame(other(S.turn), `${label(S.turn)} found the burned agent.`, 'burn'); }
+  if(remaining('red') === 0){ sfx.win(); return endGame('red', 'All Red agents found.'); }
+  if(remaining('blue') === 0){ sfx.win(); return endGame('blue', 'All Blue agents found.'); }
+  c.type === S.turn ? sfx.good() : sfx.bad();
+  render();
+}
+
+function switchTurn(){ if(S.over) return; S.turn = other(S.turn); sfx.stamp(); render(); }
+
+function undo(){
+  const last = S.history.pop();
+  if(!last) return;
+  S.cards[last.i].revealed = false;
+  if(S.over){ scores[S.winner] = Math.max(0, scores[S.winner]-1); store.set('lexicon-scores', scores); S.over = false; S.winner = null; }
+  S.turn = last.turn;
+  hideDialog(); render();
+}
+
+function endGame(winner, reason, how){
+  S.over = true; S.winner = winner;
+  scores[winner]++; store.set('lexicon-scores', scores);
+  render();
+  const game = S, revealedCount = S.history.length;
+  setTimeout(()=>{
+    if(S !== game || !S.over || S.history.length !== revealedCount) return; // undone or new round
+    showDialog(`
+      <span style="color:var(--${how==='burn'?'burn':winner})">${svg(how==='burn'?'burn':'agent','hero')}</span>
+      <div class="big-stamp" style="color:var(--${winner})">MISSION COMPLETE</div>
+      <h3 style="color:var(--${winner})">${label(winner)} wins</h3>
+      <p>${reason}<br>Score: Red ${scores.red} · Blue ${scores.blue}</p>
+      <div class="btns"><button class="primary" id="dlgNext">Next round</button><button id="dlgView">View board</button><button id="dlgUndo">Undo last card</button></div>`);
+    $('dlgNext').onclick = ()=>{ hideDialog(); nextRound(); };
+    $('dlgView').onclick = hideDialog;
+    $('dlgUndo').onclick = undo;
+  }, 700);
+}
+
+function nextRound(){ scores.round++; store.set('lexicon-scores', scores); newRound(); }
+
+/* ---------- rendering ---------- */
+const STAMPS = {red:'RED AGENT', blue:'BLUE AGENT', neutral:'CIVILIAN', burn:'BURNED'};
+const SHORT = {red:'RED', blue:'BLUE', neutral:'CIVIL', burn:'BURNED'};
+
+function render(){
+  $('roundNo').textContent = scores.round;
+  $('scoreRed').textContent = scores.red;
+  $('scoreBlue').textContent = scores.blue;
+  $('leftRed').textContent = remaining('red');
+  $('leftBlue').textContent = remaining('blue');
+  $('app').classList.toggle('spy', S.spy || S.over);
+  $('app').classList.toggle('over', S.over);
+  $('spyBtn').querySelector('span').textContent = S.spy ? 'Hide spymaster key' : 'Show spymaster key';
+
+  const t = S.turn;
+  $('turnText').innerHTML = S.over
+    ? `<span class="team-${S.winner}">${label(S.winner)} team wins the round</span>`
+    : `<span class="team-${t}">${label(t)} team</span>’s turn`;
+
+  const bar = $('clueBar');
+  bar.style.setProperty('--team-color', `var(--${S.over ? S.winner : t})`);
+  const undoBtn = `<button id="undoBtn" ${S.history.length ? '' : 'disabled'}>Undo</button>`;
+  bar.innerHTML = S.over
+    ? `<span class="active-clue">Round over.</span>${undoBtn}<button class="primary" id="nextBtn">Next round</button>`
+    : `<span class="active-clue">Click a card to reveal it.</span>${undoBtn}<button class="primary" id="switchBtn">End ${label(t)} turn</button>`;
+  $('undoBtn').onclick = undo;
+  if(S.over) $('nextBtn').onclick = nextRound; else $('switchBtn').onclick = switchTurn;
+
+  const board = $('board');
+  board.innerHTML = '';
+  const showKey = S.spy || S.over;
+  S.cards.forEach((c,i)=>{
+    const el = document.createElement('button');
+    const len = c.word.length;
+    const isPic = c.pic !== undefined;
+    el.className = 'card' + (isPic ? ' pic surreal' + (c.custom ? ' photo' : '') + (c.custom ? ' custom' : '') : len > 10 ? ' xl' : len > 7 ? ' long' : '') + (c.revealed || showKey ? ' '+c.type : '') + (c.revealed ? ' revealed' : '');
+    let html = '';
+    if(c.revealed) html += (isPic ? '' : svg(ART[c.type], 'art')) + `<span class="stamp"><span class="full">${STAMPS[c.type]}</span><span class="short">${SHORT[c.type]}</span></span>`;
+    else if(showKey) html += svg(ART[c.type], 'tag');
+    html += isPic
+      ? c.art
+      : `<span class="word">${esc(c.word)}</span>`;
+    el.innerHTML = html;
+    el.title = isPic ? c.word.toLowerCase() : '';
+    el.setAttribute('aria-label', c.word + (c.revealed ? ', ' + STAMPS[c.type] : ''));
+    el.onclick = ()=>reveal(i);
+    board.appendChild(el);
+  });
+
+  $('log').innerHTML = S.history.length ? S.history.slice().reverse().map(h=>{
+    const c = S.cards[h.i];
+    return `<li><span class="who ${h.turn}">${label(h.turn)}</span> revealed ${esc(c.word.toLowerCase())}
+      <span class="guesses">→ ${STAMPS[c.type].toLowerCase()}</span></li>`; }).join('')
+    : `<li class="empty">No cards revealed yet.</li>`;
+
+}
+
+function esc(s){ return String(s).replace(/[&<>"]/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch])); }
+
+let toastTimer;
+function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2200); }
+function showDialog(html){ $('dialog').innerHTML = html; $('overlay').classList.add('show'); }
+function hideDialog(){ $('overlay').classList.remove('show'); }
+function confirmDialog(title, body, yes, onYes, extra=''){
+  showDialog(`${extra}<h3>${title}</h3><p>${body}</p><div class="btns"><button class="primary" id="dlgYes">${yes}</button><button id="dlgNo">Cancel</button></div>`);
+  $('dlgYes').onclick = ()=>{ hideDialog(); onYes(); };
+  $('dlgNo').onclick = hideDialog;
+}
+
+/* ---------- controls ---------- */
+$('logo').innerHTML = ICONS.logo;
+$('keyIcon').innerHTML = ICONS.key;
+$('spyBtn').onclick = ()=>{
+  if(S.over) return;
+  if(S.spy){ S.spy = false; render(); return; }
+  confirmDialog('Spymasters only', 'Operatives, look away from the screen. Cards can’t be revealed while the key is showing.', 'Show key',
+    ()=>{ S.spy = true; render(); }, `<span style="color:var(--burn)">${svg('key','hero')}</span><div class="big-stamp" style="color:var(--burn)">EYES ONLY</div>`);
+};
+$('newBtn').onclick = ()=>{
+  if(S.over){ nextRound(); return; }
+  confirmDialog('Abandon mission?', 'Start a new board. Nobody gets a point for this round.', 'New board', nextRound);
+};
+$('resetScoreBtn').onclick = ()=> confirmDialog('Reset scores?', 'Set both teams back to 0 and start again at round 1.', 'Reset',
+  ()=>{ scores={red:0,blue:0,round:1}; store.set('lexicon-scores',scores); newRound(); });
+function setMode(m){
+  if(m === mode && S) return;
+  const apply = ()=>{ mode = m; store.set('lexicon-mode', mode); syncModeButtons(); };
+  if(S && !S.over && S.history.length){
+    confirmDialog('Switch cards?', 'Changing the card type deals a new board. Nobody gets a point for this round.', 'New board', ()=>{ apply(); nextRound(); });
+  } else { apply(); newRound(); }
+}
+function syncModeButtons(){
+  $('modePic').setAttribute('aria-pressed', mode==='pictures');
+  $('modeWord').setAttribute('aria-pressed', mode==='words');
+  $('modeMine').setAttribute('aria-pressed', mode==='custom');
+}
+$('modePic').onclick = ()=>setMode('pictures');
+$('modeWord').onclick = ()=>setMode('words');
+$('modeMine').onclick = ()=> findCustom().then(list=>{
+  if(list.length >= 25) return setMode('custom');
+  showDialog(`<h3>Add your pictures</h3><p>${list.length ? `Found only ${list.length} picture${list.length>1?'s':''} in <b>assets/custom/</b>. You need at least 25.` : 'No pictures found in <b>assets/custom/</b>.'}</p>
+    <p>Name them <b>1.jpg, 2.jpg, 3.png…</b>, or run <b>python3 tools/list_custom.py</b> after adding files with any names. Then reload this page.</p>
+    <div class="btns"><button class="primary" id="dlgNo">OK</button></div>`);
+  $('dlgNo').onclick = hideDialog; });
+if(mode === 'photos' || mode === 'ai') mode = 'pictures'; // removed modes
+syncModeButtons();
+if(typeof PICTURES === 'undefined') $('modePic').disabled = true;
+colorOn = store.get('lexicon-color', false);
+$('colorChk').checked = colorOn;
+$('colorChk').disabled = !hasColor();
+$('colorChk').onchange = e=>{ colorOn = e.target.checked; store.set('lexicon-color', colorOn);
+  if(!S) return;
+  S.cards.forEach(c=>{ if(c.cont !== undefined) c.art = surrealCard(c.inner, c.cont, c.artId, c.seed).art; });
+  render(); };
+$('soundChk').checked = soundOn;
+$('soundChk').onchange = e=>{ soundOn = e.target.checked; store.set('lexicon-sound', soundOn); };
+$('overlay').onclick = e=>{ if(e.target.id==='overlay') hideDialog(); };
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') hideDialog(); });
+// collapse the log by default on phones
+if(matchMedia('(max-width:600px)').matches) $('logBox').open = false;
+// keep the log always open on larger screens
+$('logBox').addEventListener('toggle', ()=>{ if(!matchMedia('(max-width:600px)').matches) $('logBox').open = true; });
+
+if(mode === 'custom') findCustom().then(()=>newRound()); else newRound();
+</script>
+</body>
+</html>
