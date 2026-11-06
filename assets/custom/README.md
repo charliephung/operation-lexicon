@@ -1,6 +1,6 @@
-# Your own card pictures ("Mine" mode)
+# Your own card pictures ("Custom" mode)
 
-Put your images in this folder, then choose **Mine** under Controls in the game.
+Put your images in this folder, then choose **Custom** under Controls in the game.
 
 Two ways to name them:
 

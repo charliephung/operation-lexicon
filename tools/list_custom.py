@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""List every image in assets/custom/ so the game's "Mine" mode can use any filenames.
+"""List every image in assets/custom/ so the game's "Custom" mode can use any filenames.
 Usage: python3 tools/list_custom.py"""
 import json, os
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

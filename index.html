@@ -122,7 +122,7 @@ button.primary{background:var(--ink); color:var(--paper)}
 .card .scene{position:absolute; inset:0; width:100%; height:100%; display:block; object-fit:cover; transition:opacity .3s, filter .3s}
 .card.surreal.revealed .scene{filter:grayscale(1) contrast(.85); opacity:.32; mix-blend-mode:multiply}
 .card.surreal.revealed.burn .scene{mix-blend-mode:screen; opacity:.28}
-/* Mine mode: whole picture with a margin; revealed cards get a team-color overlay */
+/* Custom mode: whole picture with a margin; revealed cards get a team-color overlay */
 .card.custom .scene{inset:auto; top:6%; left:5%; width:90%; height:88%; object-fit:contain}
 .card.custom.revealed .scene{filter:none; opacity:1; mix-blend-mode:normal}
 .card.custom.revealed::after{content:""; position:absolute; inset:0; z-index:1; pointer-events:none; opacity:.62}
@@ -311,7 +311,7 @@ footer.credits a{color:inherit}
           <button id="spyBtn"><svg viewBox="0 0 512 512" id="keyIcon"></svg><span>Show spymaster key</span></button>
           <button id="newBtn">New round</button>
           <button id="resetScoreBtn">Reset scores</button>
-          <div class="mode" role="group" aria-label="Card type"><button id="modePic" aria-pressed="true">Art</button><button id="modeMine" aria-pressed="false">Mine</button><button id="modeWord" aria-pressed="false">Words</button></div>
+          <div class="mode" role="group" aria-label="Card type"><button id="modePic" aria-pressed="true">Art</button><button id="modeMine" aria-pressed="false">Custom</button><button id="modeWord" aria-pressed="false">Words</button></div>
           <label><input type="checkbox" id="colorChk"> Color pictures</label>
           <label><input type="checkbox" id="soundChk" checked> Sound effects</label>
         </div>
@@ -448,7 +448,7 @@ function surrealCard(inner, cont, id, seed){
 
 function photoLoaded(img){ img.closest('.card')?.classList.add('loaded'); }
 
-/* ---------- "Mine": the player's own pictures in assets/custom/ ---------- */
+/* ---------- "Custom": the player's own pictures in assets/custom/ ---------- */
 let customFound = null, customProbe = null;
 function findCustom(){
   if(typeof CUSTOM_PICS !== 'undefined' && CUSTOM_PICS.length) return Promise.resolve(customFound = CUSTOM_PICS.slice());
